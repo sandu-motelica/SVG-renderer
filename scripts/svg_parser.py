@@ -20,6 +20,7 @@ class Parser:
              path (str): The path to the SVG file to be parsed.
         """
         self.path = path
+        self.parsed_elements = ['rect', 'circle', 'line', 'ellipse', 'path']
 
     def parse(self):
         """
@@ -42,24 +43,18 @@ class Parser:
         for element in root:
             tag = element.tag.split('}')[1]
             attributes = element.attrib
-
-            if tag == "rect":
-                elements.append(self.parse_rectangle(attributes))
-            elif tag == "circle":
-                elements.append(self.parse_circle(attributes))
-            elif tag == "line":
-                elements.append(self.parse_line(attributes))
-            elif tag == "ellipse":
-                elements.append(self.parse_ellipse(attributes))
-            elif tag == "path":
-                elements.append(self.parse_path(attributes))
-
+            if tag in self.parsed_elements:
+                parse_function = getattr(Parser, f"parse_{tag}", None)
+                if callable(parse_function):
+                    elements.append(parse_function(attributes))
+                else:
+                    print(f"Function 'parse_{tag}' is not defined.")
 
         print(elements)
         return elements
 
     @staticmethod
-    def parse_rectangle(attributes):
+    def parse_rect(attributes):
         """
         Parses a rectangle element and extracts its attributes.
 
@@ -76,8 +71,8 @@ class Parser:
             "y": float(attributes.get("y", 0)),
             "width": float(attributes.get("width", 0)),
             "height": float(attributes.get("height", 0)),
-            "stroke": attributes.get("stroke", "none"),
-            "fill": attributes.get("fill", "none")
+            "stroke": attributes.get("stroke", None),
+            "fill": attributes.get("fill", None)
         }
 
     @staticmethod
@@ -96,8 +91,8 @@ class Parser:
             "cx": float(attributes.get("cx", 0)),
             "cy": float(attributes.get("cy", 0)),
             "r": float(attributes.get("r", 0)),
-            "fill": attributes.get("fill", "none"),
-            "stroke": attributes.get("stroke", "none")
+            "fill": attributes.get("fill", None),
+            "stroke": attributes.get("stroke", None)
         }
 
     @staticmethod
@@ -117,8 +112,8 @@ class Parser:
             "y1": float(attributes.get("y1", 0)),
             "x2": float(attributes.get("x2", 0)),
             "y2": float(attributes.get("y2", 0)),
-            "fill": attributes.get("fill", "none"),
-            "stroke": attributes.get("stroke", "none")
+            "width": int(attributes.get("stroke-width", 0)),
+            "stroke": attributes.get("stroke", None)
         }
 
     @staticmethod
@@ -138,8 +133,8 @@ class Parser:
             "cy": float(attributes.get("cy", 0)),
             "rx": float(attributes.get("rx", 0)),
             "ry": float(attributes.get("ry", 0)),
-            "stroke": attributes.get("stroke", "none"),
-            "fill": attributes.get("fill", "none")
+            "stroke": attributes.get("stroke", None),
+            "fill": attributes.get("fill", None)
         }
 
     @staticmethod
@@ -156,6 +151,6 @@ class Parser:
         return {
             "type": "path",
             "d": attributes.get("d", ""),
-            "stroke": attributes.get("stroke", "none"),
-            "fill": attributes.get("fill", "none")
+            "stroke": attributes.get("stroke", None),
+            "fill": attributes.get("fill", None)
         }
