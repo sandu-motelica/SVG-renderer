@@ -11,6 +11,7 @@ class Parser:
     - Line
     - Ellipse
     - Path
+    - Polyline
     """
 
     def __init__(self, path):
@@ -20,7 +21,7 @@ class Parser:
              path (str): The path to the SVG file to be parsed.
         """
         self.path = path
-        self.parsed_elements = ['rect', 'circle', 'line', 'ellipse', 'path']
+        self.parsed_elements = ['rect', 'circle', 'line', 'ellipse', 'path', 'polyline']
 
     def parse(self):
         """
@@ -92,6 +93,7 @@ class Parser:
             "cy": float(attributes.get("cy", 0)),
             "r": float(attributes.get("r", 0)),
             "fill": attributes.get("fill", None),
+            "width": int(attributes.get("stroke-width", 0)),
             "stroke": attributes.get("stroke", None)
         }
 
@@ -134,6 +136,7 @@ class Parser:
             "rx": float(attributes.get("rx", 0)),
             "ry": float(attributes.get("ry", 0)),
             "stroke": attributes.get("stroke", None),
+            "width": int(attributes.get("stroke-width", 0)),
             "fill": attributes.get("fill", None)
         }
 
@@ -152,5 +155,16 @@ class Parser:
             "type": "path",
             "d": attributes.get("d", ""),
             "stroke": attributes.get("stroke", None),
-            "fill": attributes.get("fill", None)
+            "width": int(attributes.get("stroke-width", 0)),
+            "fill": attributes.get("fill", "black")
+        }
+
+    @staticmethod
+    def parse_polyline(attributes):
+        return {
+            "type": "polyline",
+            "points": attributes.get("points", ""),
+            "stroke": attributes.get("stroke", None),
+            "width": int(attributes.get("stroke-width", 0)),
+            "fill": attributes.get("fill", "black")
         }

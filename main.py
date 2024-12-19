@@ -6,6 +6,6 @@ if __name__ == '__main__':
 
     p = Parser("data\\example.svg")
     elements = p.parse()
-    r = Renderer(200, 200)
+    r = Renderer(400, 400)
     r.draw_elements(elements)
     r.save_PNG("output.png")
