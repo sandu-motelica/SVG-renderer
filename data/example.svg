@@ -1,7 +1,19 @@
-<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-    <rect x="30" y="30" width="100" height="70" stroke="black" fill="red"/>
-    <rect x="90" y="90" width="100" height="70" fill="red"/>
-    <circle cx="100" cy="100" r="40" fill="blue" stroke="green"/>
-    <ellipse cx="150" cy="50" rx="30" ry="20" fill="yellow" stroke="black"/>
-    <line x1="0" y1="0" x2="200" y2="200" stroke="black" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+    <!-- Rectangle -->
+    <rect x="20" y="20" width="80" height="40" fill="blue" stroke="black" stroke-width="2"/>
+
+    <!-- Circle -->
+    <circle cx="140" cy="40" r="20" fill="red" stroke="#aaa"/>
+
+    <!-- Ellipse -->
+    <ellipse cx="80" cy="120" rx="40" ry="20" fill="yellow" stroke="white" stroke-width="2"/>
+
+    <!-- Line -->
+    <line x1="180" y1="20" x2="180" y2="120" stroke="green" stroke-width="3"/>
+
+    <!-- Path -->
+    <path d="M 20 200 Q 100 150 180 200 T 340 200" fill="transparent" stroke="purple" stroke-width="3"/>
+
+    <!-- Polyline -->
+    <polyline points="60,240 120,240 90,200" fill="red" stroke="blue" stroke-width="3"/>
 </svg>

@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-
+from PIL import ImageColor
 
 class Parser:
     """
@@ -14,6 +14,8 @@ class Parser:
     - Polyline
     """
 
+    DEFAULT_COLOR = 'black'
+
     def __init__(self, path):
         """
         Initializes the Parser with the path to the SVG file.
@@ -22,6 +24,23 @@ class Parser:
         """
         self.path = path
         self.parsed_elements = ['rect', 'circle', 'line', 'ellipse', 'path', 'polyline']
+
+    def extract_dimensions(self):
+        tree = ET.parse(self.path)
+        root = tree.getroot()
+
+        width = root.attrib.get('width')
+        height = root.attrib.get('height')
+
+        if not width or not height:
+            viewbox = root.attrib.get('viewBox')
+            if viewbox:
+                _, _, width, height = map(float, viewbox.split())
+            else:
+                print("Invalid dimensions")
+                exit(1)
+
+        return int(width), int(height)
 
     def parse(self):
         """
@@ -51,7 +70,7 @@ class Parser:
                 else:
                     print(f"Function 'parse_{tag}' is not defined.")
 
-        print(elements)
+        # print(elements)
         return elements
 
     @staticmethod
@@ -72,8 +91,8 @@ class Parser:
             "y": float(attributes.get("y", 0)),
             "width": float(attributes.get("width", 0)),
             "height": float(attributes.get("height", 0)),
-            "stroke": attributes.get("stroke", None),
-            "fill": attributes.get("fill", None)
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
+            "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
 
     @staticmethod
@@ -92,9 +111,9 @@ class Parser:
             "cx": float(attributes.get("cx", 0)),
             "cy": float(attributes.get("cy", 0)),
             "r": float(attributes.get("r", 0)),
-            "fill": attributes.get("fill", None),
+            "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR)),
             "width": int(attributes.get("stroke-width", 0)),
-            "stroke": attributes.get("stroke", None)
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR))
         }
 
     @staticmethod
@@ -115,7 +134,7 @@ class Parser:
             "x2": float(attributes.get("x2", 0)),
             "y2": float(attributes.get("y2", 0)),
             "width": int(attributes.get("stroke-width", 0)),
-            "stroke": attributes.get("stroke", None)
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR))
         }
 
     @staticmethod
@@ -135,9 +154,9 @@ class Parser:
             "cy": float(attributes.get("cy", 0)),
             "rx": float(attributes.get("rx", 0)),
             "ry": float(attributes.get("ry", 0)),
-            "stroke": attributes.get("stroke", None),
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
             "width": int(attributes.get("stroke-width", 0)),
-            "fill": attributes.get("fill", None)
+            "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
 
     @staticmethod
@@ -151,20 +170,69 @@ class Parser:
         Returns:
             dict: A dictionary with path attributes.
         """
+        if not isinstance(attributes, dict):
+            raise ValueError("Expected attributes to be a dictionary")
+
         return {
             "type": "path",
             "d": attributes.get("d", ""),
-            "stroke": attributes.get("stroke", None),
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
             "width": int(attributes.get("stroke-width", 0)),
-            "fill": attributes.get("fill", "black")
+            "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR)),
         }
 
     @staticmethod
     def parse_polyline(attributes):
+        """
+        Parses the attributes of an SVG polyline element into a dictionary.
+
+        Args:
+            attributes (dict): The attributes of the polyline element.
+
+        Returns:
+            dict: A dictionary with polyline attributes.
+        """
         return {
             "type": "polyline",
             "points": attributes.get("points", ""),
-            "stroke": attributes.get("stroke", None),
+            "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
             "width": int(attributes.get("stroke-width", 0)),
-            "fill": attributes.get("fill", "black")
+            "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
+
+    @staticmethod
+    def parse_color(color):
+        """
+        Parses a color value and returns it in a format usable by the renderer.
+
+        Args:
+            color (str): The color value, which can be:
+                - 'none' or 'transparent': Returns `None`.
+                - 'rgba()': A string in the 'rgba(r,g,b,a)' format.
+                - '#RRGGBB', 'rgb()', or named colors: Validated by Pillow's ImageColor.
+                - Invalid colors: Replaced with a default color.
+
+        Returns:
+            tuple or str or None:
+                - `None` if the color is 'none' or 'transparent'.
+                - `(r, g, b, a)` if the color is in 'rgba()' format.
+                - The original string for valid named or hex colors.
+                - Default color if invalid.
+        """
+        if not color or color in ["none", "transparent"]:
+            return None
+
+        if color.startswith('rgba'):
+            try:
+                values = color[color.index('(') + 1:color.index(')')].split(',')
+                r, g, b = map(int, values[:3])
+                a = int(float(values[3]) * 255) if len(values) == 4 else 255
+                return r, g, b, a
+            except (ValueError, IndexError):
+                return Parser.DEFAULT_COLOR
+
+        try:
+            ImageColor.getrgb(color)
+            return color
+        except ValueError:
+            return Parser.DEFAULT_COLOR
