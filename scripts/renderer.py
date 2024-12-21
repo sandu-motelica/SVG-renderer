@@ -17,7 +17,7 @@ class Renderer:
            draw (ImageDraw): The Pillow ImageDraw object used for drawing.
        """
 
-    def __init__(self, width, height, elements_supported=None):
+    def __init__(self, width, height, scale=2, elements_supported=None):
         """
         Initializes the Renderer with a blank image and supported elements.
 
@@ -26,17 +26,17 @@ class Renderer:
             height (int): Height of the image.
             elements_supported (list[str], optional): A list of element types that
                 the renderer supports. If None, the default supported elements
-                are ['rect', 'circle', 'line', 'ellipse', 'path'].
+                are ['rect', 'circle', 'line', 'ellipse', 'path', 'polyline'].
         """
 
         self.width = width
         self.height = height
-        self.image = Image.new('RGBA', (width, height), (255, 255, 255, 0))
+        self.image = Image.new('RGBA', (int(width * scale), int(height * scale)), (255, 255, 255, 0))
         self.elements_supported = elements_supported
         if self.elements_supported is None:
             self.elements_supported = elements_supported
         self.elements_supported = ['rect', 'circle', 'line', 'ellipse', 'path', 'polyline']
-        self.draw = ImageDraw.Draw(self.image)
+        self.draw = ImageDraw.Draw(self.image, 'RGBA')
 
     def draw_elements(self, elements):
         """
@@ -78,8 +78,9 @@ class Renderer:
         h = element['height']
         fill = element['fill']
         stroke = element['stroke']
-        width = element['width']
-        self.draw.rectangle([x, y, x + w, y + h], fill=fill, outline=stroke)
+        width = element['stroke-width']
+
+        self.draw.rectangle([x, y, x + w, y + h], fill=fill, outline=stroke, width=width)
 
     def draw_circle(self, element):
         """
@@ -99,8 +100,8 @@ class Renderer:
         r = element['r']
         fill = element['fill']
         stroke = element['stroke']
-        width = element['width']
-        self.draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill, outline=stroke)
+        width = element['stroke-width']
+        self.draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill, outline=stroke, width=width)
 
     def draw_line(self, element):
         """
@@ -121,7 +122,7 @@ class Renderer:
         x2 = element['x2']
         y2 = element['y2']
         stroke = element['stroke']
-        width = element['width']
+        width = element['stroke-width']
         self.draw.line([x1, y1, x2, y2], fill=stroke, width=width)
 
     def draw_ellipse(self, element):
@@ -143,8 +144,8 @@ class Renderer:
         ry = element['ry']
         stroke = element['stroke']
         fill = element['fill']
-        width = element['width']
-        self.draw.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], fill=fill, outline=stroke)
+        width = element['stroke-width']
+        self.draw.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], fill=fill, outline=stroke, width=width)
 
     def draw_polyline(self, element):
         """
@@ -155,7 +156,7 @@ class Renderer:
                 - 'points' (str): Comma-separated coordinates ("x1,y1 x2,y2").
                 - 'stroke' (str): Line color.
                 - 'fill' (str): Fill color or None.
-                - 'width' (int): Line width.
+                - 'stroke-width' (int): Line width.
         """
 
         points = element['points'].split(' ')
@@ -163,7 +164,7 @@ class Renderer:
 
         stroke = element['stroke']
         fill = element['fill']
-        width = element['width']
+        width = element['stroke-width']
 
         if fill:
             self.draw.polygon(points, fill=fill)
@@ -179,12 +180,12 @@ class Renderer:
                 - 'd' (str): Path data (SVG format).
                 - 'stroke' (str): Outline color.
                 - 'fill' (str): Fill color or None.
-                - 'width' (int): Line width.
+                - 'stroke-width' (int): Line width.
         """
         path_data = element['d']
         stroke = element['stroke']
         fill = element['fill']
-        width = element['width']
+        width = element['stroke-width']
 
         parser = PathParser(path_data)
         points = parser.parse()

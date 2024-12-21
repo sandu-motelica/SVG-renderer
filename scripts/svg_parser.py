@@ -70,7 +70,6 @@ class Parser:
                 else:
                     print(f"Function 'parse_{tag}' is not defined.")
 
-        # print(elements)
         return elements
 
     @staticmethod
@@ -92,6 +91,7 @@ class Parser:
             "width": float(attributes.get("width", 0)),
             "height": float(attributes.get("height", 0)),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
 
@@ -112,7 +112,7 @@ class Parser:
             "cy": float(attributes.get("cy", 0)),
             "r": float(attributes.get("r", 0)),
             "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR)),
-            "width": int(attributes.get("stroke-width", 0)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR))
         }
 
@@ -133,7 +133,7 @@ class Parser:
             "y1": float(attributes.get("y1", 0)),
             "x2": float(attributes.get("x2", 0)),
             "y2": float(attributes.get("y2", 0)),
-            "width": int(attributes.get("stroke-width", 0)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR))
         }
 
@@ -155,7 +155,7 @@ class Parser:
             "rx": float(attributes.get("rx", 0)),
             "ry": float(attributes.get("ry", 0)),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
-            "width": int(attributes.get("stroke-width", 0)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
 
@@ -177,7 +177,7 @@ class Parser:
             "type": "path",
             "d": attributes.get("d", ""),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
-            "width": int(attributes.get("stroke-width", 0)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR)),
         }
 
@@ -196,7 +196,7 @@ class Parser:
             "type": "polyline",
             "points": attributes.get("points", ""),
             "stroke": Parser.parse_color(attributes.get("stroke", Parser.DEFAULT_COLOR)),
-            "width": int(attributes.get("stroke-width", 0)),
+            "stroke-width": int(attributes.get("stroke-width", 0)),
             "fill": Parser.parse_color(attributes.get("fill", Parser.DEFAULT_COLOR))
         }
 

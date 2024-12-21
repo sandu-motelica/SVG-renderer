@@ -3,19 +3,19 @@ from scripts.renderer import Renderer
 import sys
 
 
-def convert(input, output):
+def convert(input, output, scale=4):
     """
     Converts an SVG file to a PNG file.
 
     Args:
         input (str): Path to the input SVG file.
         output (str): Path to the output PNG file.
-
+        scale (int): Scaling factor for resolution.
     """
     p = Parser(input)
     width, height = p.extract_dimensions()
     elements = p.parse()
-    r = Renderer(width, height)
+    r = Renderer(width, height, scale)
     r.draw_elements(elements)
     r.save_PNG(output)
 
